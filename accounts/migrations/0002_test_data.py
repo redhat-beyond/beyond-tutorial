@@ -4,6 +4,7 @@ from django.db import migrations, transaction
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('auth', '__latest__'),
         ('accounts', '0001_initial'),
     ]
 
