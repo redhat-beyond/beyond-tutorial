@@ -10,4 +10,3 @@ for model in models:
         admin.site.register(model)
     except admin.sites.AlreadyRegistered:
         pass
-

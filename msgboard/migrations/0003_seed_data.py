@@ -59,6 +59,7 @@ class Migration(migrations.Migration):
                 [('bkorren', '2020-11-20', ':-)')], [],
                 [('bkorren', 'Buy/Sell/Swap', '2020-11-20', 'How much does it cost?', [], [], [], [])])
         ]
+
         with transaction.atomic():
             for category, values in category_data:
                 cat = LookupCategories(category=category)
