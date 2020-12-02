@@ -1,0 +1,5 @@
+[flake8]
+per-file-ignores = 
+    # line to long on system created file
+    0001_initial.py: E501
+
