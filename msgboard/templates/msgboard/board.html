@@ -1,12 +1,12 @@
-<html>
-<head>
-<title>Beyond message board</title>
+{% extends "base.html" %}
+
+{% block pagemeta %}
 <style type="text/css">
 	.author, .eom, .newmsg { color: grey }
 </style>
-</head>
+{% endblock %}
 
-<body>
+{% block content %}
 <h1>Beyond message board</h1>
 <div class="newfrm">
 	<p class="newmsg">New message:</p>
@@ -25,4 +25,4 @@
 	</div>
 {% endfor %}
 <p class="EOM">(End of messages)</p>
-</body>
+{% endblock %}
