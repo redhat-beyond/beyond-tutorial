@@ -7,14 +7,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="newfrm">
-	<p class="newmsg">New message:</p>
-	<form method="POST">
-		{% csrf_token %}
-		{{ form.as_p }}
-		<input type="submit" value="Post">
-	</form>
-</div>
+{% if form %}
+  <div class="newfrm">
+    <p class="newmsg">New message:</p>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Post">
+    </form>
+  </div>
+{% else %}
+  <a href="{% url 'login' %}?next={{request.path}}"}>Login to post</a>
+{% endif %}
 {% for message in messages %}
 	<div class="message">
 		<p class="author">
