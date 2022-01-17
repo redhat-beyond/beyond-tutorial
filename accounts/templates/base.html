@@ -17,6 +17,24 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Beyond message board</a>
+      <ul class="navbar-nav ms-auto">
+        {% if request.user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="accountDisplay" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="{{ request.user.account.avatar_url }}" width="26">
+              Hi {{ request.user.get_username }}!
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="accountDisplay">
+              <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}?next={{request.path}}">Login</a>
+          </li>
+        {% endif %}
+      </ul>
     </div>
   </nav>
 
