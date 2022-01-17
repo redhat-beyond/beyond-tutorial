@@ -22,7 +22,8 @@
 {% for message in messages %}
 	<div class="message">
 		<p class="author">
-			Posted by {{message.author}} at {{message.date}}
+      <img src="{{ message.author.avatar_url }}" width="26">
+			Posted by {{message.author.user.username}} at {{message.date}}
 		</p>
 		<p>{{ message.text }}</p>
 	</div>

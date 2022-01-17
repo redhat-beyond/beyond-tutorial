@@ -1,18 +1,20 @@
 from django.shortcuts import render, redirect
-from .models import Message
-from .forms import MessageForm
+from .models import UserMessage
+from .forms import UserMessageForm
 
 
 def board(request):
-    messages = Message.objects.order_by('-date')
+    messages = UserMessage.objects.order_by('-date').select_related()
     if request.user.is_authenticated:
         if request.method == "POST":
-            form = MessageForm(request.POST)
+            form = UserMessageForm(request.POST)
             if form.is_valid():
-                form.save()
+                message = form.save(commit = False)
+                message.author = request.user.account
+                message.save()
                 return redirect('board')
         else:
-            form = MessageForm()
+            form = UserMessageForm()
     else:
         form = None
     return render(request, 'msgboard/board.html', {
