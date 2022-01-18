@@ -15,6 +15,8 @@ def board(request):
         else:
             form = UserMessageForm()
     else:
+        if request.method == "POST":
+            return redirect('board')
         form = None
     messages = UserMessage.messages.main_feed()
     return render(request, 'msgboard/board.html', {
