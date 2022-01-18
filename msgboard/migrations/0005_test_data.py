@@ -5,10 +5,15 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('msgboard', '0004_usermessage'),
-        ('accounts', '0002_test_data')
+        ('accounts', '0002_test_data'),
     ]
 
     def generate_data(apps, schema_editor):
+        from django.conf import settings
+
+        if not settings.DEBUG:
+            return
+
         from accounts.models import Account
         from msgboard.models import UserMessage
 
