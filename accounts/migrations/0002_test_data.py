@@ -24,10 +24,10 @@ class Migration(migrations.Migration):
             for dev_account in dev_accounts:
                 user = User.objects.create_user(dev_account)
                 Account(
-                    user=user, 
+                    user=user,
                     avatar_url=static(f"builtin_avatars/{dev_account}.png")
                 ).save()
 
     operations = [
         migrations.RunPython(generate_data),
-    ] 
+    ]

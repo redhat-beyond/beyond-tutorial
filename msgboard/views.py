@@ -9,7 +9,7 @@ def board(request):
         if request.method == "POST":
             form = UserMessageForm(request.POST)
             if form.is_valid():
-                message = form.save(commit = False)
+                message = form.save(commit=False)
                 message.author = request.user.account
                 message.save()
                 return redirect('board')

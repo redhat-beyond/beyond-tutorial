@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 from msgboard.views import board
-from accounts.views import login_form  
+from accounts.views import login_form
 
 urlpatterns = [
     path('admin/', admin.site.urls),
