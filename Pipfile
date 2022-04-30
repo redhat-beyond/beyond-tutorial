@@ -11,6 +11,7 @@ pytest-django = "*"
 django = "*"
 gunicorn = "*"
 dj-database-url = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"
