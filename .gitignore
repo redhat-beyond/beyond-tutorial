@@ -131,9 +131,6 @@ dmypy.json
 # Vagrant
 .vagrant/
 
-# Logs
-nohup.out
-
 # DB:
 db.sqlite3
 
