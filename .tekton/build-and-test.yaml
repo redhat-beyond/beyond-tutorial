@@ -1,0 +1,153 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pytest-s2i-image
+spec:
+  params:
+  - name: IMAGE
+    type: string
+  steps:
+  - args:
+    - |-
+      micropipenv install --dev
+      pytest -v
+    command:
+    - /bin/bash
+    - -exc
+    image: $(params.IMAGE)
+    name: run-tests
+    resources: {}
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build
+spec:
+  params:
+  - default: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/beyond-tutorial
+    description: Distination for the built image
+    name: IMAGE
+    type: string
+  - default: latest
+    description: Tag for the built image
+    name: TAG
+    type: string
+  - default: openshift-compat
+    description: Repo branch to clone
+    name: BRANCH
+    type: string
+  tasks:
+  - name: s2i-python
+    params:
+    - name: VERSION
+      value: 3.9-ubi8
+    - name: PATH_CONTEXT
+      value: .
+    - name: TLSVERIFY
+      value: "false"
+    - name: IMAGE
+      value: $(params.IMAGE):$(params.TAG)
+    - name: SKIP_PUSH
+      value: "false"
+    - name: ENV_VARS
+      value:
+      - ENABLE_MICROPIPENV=true
+    runAfter:
+    - git-clone
+    taskRef:
+      kind: ClusterTask
+      name: s2i-python
+    workspaces:
+    - name: source
+      workspace: shared-source
+  - name: git-clone
+    params:
+    - name: url
+      value: https://github.com/ifireball/beyond-tutorial.git
+    - name: revision
+      value: $(params.BRANCH)
+    - name: submodules
+      value: "true"
+    - name: depth
+      value: "1"
+    - name: sslVerify
+      value: "true"
+    - name: crtFileName
+      value: ca-bundle.crt
+    - name: deleteExisting
+      value: "true"
+    - name: verbose
+      value: "true"
+    - name: gitInitImage
+      value: registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:2b4c4958cabdceffefef68940608f2c7e6774c0b94ba3eb49fa1b9ff0b544e8c
+    - name: userHome
+      value: /tekton/home
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-source
+  - name: pytest-s2i-image
+    params:
+    - name: IMAGE
+      value: $(params.IMAGE):$(params.TAG)
+    runAfter:
+    - s2i-python
+    taskRef:
+      kind: Task
+      name: pytest-s2i-image
+  workspaces:
+  - name: shared-source
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-pr
+  annotations:
+    pipelinesascode.tekton.dev/on-target-branch: "[openshift-compat]"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+spec:
+  pipelineRef:
+    name: build
+  params:
+  - name: TAG
+    value: "pr{{pull_request_number}}"
+  - name: BRANCH
+    value: "{{source_branch}}"
+  workspaces:
+  - name: shared-source
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-branch
+  annotations:
+    pipelinesascode.tekton.dev/on-target-branch: "[openshift-compat]"
+    pipelinesascode.tekton.dev/on-event: "[push]"
+spec:
+  pipelineRef:
+    name: build
+  params:
+  - name: TAG
+    value: "{{target_branch}}"
+  - name: BRANCH
+    value: "{{source_branch}}"
+  workspaces:
+  - name: shared-source
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  
