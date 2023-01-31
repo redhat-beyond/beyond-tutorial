@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gosmee
+  namespace: gosmee
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gosmee
+  template:
+    metadata:
+      labels:
+        app: gosmee
+    spec:
+      containers:
+        - image: ghcr.io/chmouel/gosmee:main
+          imagePullPolicy: Always
+          name: gosmee
+          args:
+            [
+              "client",
+              "https://smee.io/qN2T643MoFfYUg8U",
+              "http://pipelines-as-code-controller.openshift-pipelines:8080"
+            ]
+
