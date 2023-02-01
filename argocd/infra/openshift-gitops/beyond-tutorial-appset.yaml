@@ -23,6 +23,8 @@ spec:
           nameSuffix: "-pr{{number}}"
           commonLabels:
             app.kubernetes.io/instance: "{{branch}}-{{number}}"
+          images:
+          - "image-registry.openshift-image-registry.svc:5000/beyond-tutorial/beyond-tutorial:pr{{number}}"
       destination:
         server: https://kubernetes.default.svc
         namespace: 'beyond-tutorial'
