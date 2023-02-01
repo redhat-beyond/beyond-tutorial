@@ -20,7 +20,7 @@ spec:
         targetRevision: "{{head_sha}}"
         path: 'argocd/app'
         kustomize:
-          nameSuffix: "pr{{number}}"
+          nameSuffix: "-pr{{number}}"
           commonLabels:
             app.kubernetes.io/instance: "{{branch}}-{{number}}"
       destination:
