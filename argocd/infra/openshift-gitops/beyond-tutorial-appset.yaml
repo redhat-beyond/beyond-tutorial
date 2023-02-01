@@ -12,7 +12,7 @@ spec:
       requeueAfterSeconds: 300
   template:
     metadata:
-      name: '{{path.basenameNormalized}}'
+      name: "beyond-tutorial-pr{{number}}"
     spec:
       project: "default"
       source:
