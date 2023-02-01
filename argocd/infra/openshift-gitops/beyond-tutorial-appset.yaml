@@ -10,8 +10,6 @@ spec:
         owner: ifireball
         repo: beyond-tutorial
       requeueAfterSeconds: 300
-      filters:
-      - branchMatch: "openshift-compat"
   template:
     metadata:
       name: '{{path.basenameNormalized}}'
