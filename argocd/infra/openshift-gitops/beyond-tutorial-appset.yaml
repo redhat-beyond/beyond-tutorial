@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: beyond-tutorial
+  namespace: openshift-gitops
+spec:
+  generators:
+   - pullRequest:
+      github:
+        owner: ifireball
+        repo: beyond-tutorial
+      requeueAfterSeconds: 300
+      filters:
+      - branchMatch: "openshift-compat"
+  template:
+    metadata:
+      name: '{{path.basenameNormalized}}'
+    spec:
+      project: "default"
+      source:
+        repoURL: https://github.com/ifireball/beyond-tutorial
+        targetRevision: "{{head_sha}}"
+        path: 'argocd/app'
+        kustomize:
+          nameSuffix: "pr{{number}}"
+          commonLabels:
+            app.kubernetes.io/instance: "{{branch}}-{{number}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'beyond-tutorial'
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+
