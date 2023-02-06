@@ -17,3 +17,13 @@ spec:
         - name: app
           image: image-registry.openshift-image-registry.svc:5000/beyond-tutorial/beyond-tutorial
           imagePullPolicy: Always
+          env:
+          - name: OPENSHIFT_ROUTE_NAME
+            value: route-name-here
+          - name: K8S_NAMESPACE
+            valueFrom:
+              fieldRef: metadata.namespace
+          - name: EXTERNAL_DOMAIN
+            value: apps-crc.testing
+          - name: EXTERNAL_URL
+            value: "https://$(OPENSHIFT_ROUTE_NAME)-$(K8S_NAMESPACE).$(EXTERNAL_DOMAIN)/"

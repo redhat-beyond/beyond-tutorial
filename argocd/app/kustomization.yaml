@@ -6,3 +6,19 @@ resources:
 - deployment.yaml
 - service.yaml
 - route.yaml
+replacements:
+- source:
+    group: route.openshift.io
+    version: v1
+    kind: Route
+    name: beyond-tutorial
+    namespace: beyond-tutorial
+  targets:
+  - select:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: beyond-tutorial
+      namespace: beyond-tutorial
+    fieldPaths:
+    - spec.template.spec.containers.[name=app].env.[name=OPENSHIFT_ROUTE_NAME].value
