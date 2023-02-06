@@ -13,6 +13,10 @@ spec:
   template:
     metadata:
       name: "beyond-tutorial-pr{{number}}"
+      annotations:
+        routeName: "beyond-tutorial-pr{{number}}-beyond-tutorial"
+        notifications.argoproj.io/subscribe.on-sync-state-changed.github: ""
+        notifications.argoproj.io/subscribe.on-deploy-state.github: ""
     spec:
       project: "default"
       source:

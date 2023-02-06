@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: openshift-gitops
+data:
+  service.github: |
+    # create GtiHub app at https://github.com/settings/apps/new
+    # then scroll down to PrivateKeys, create and download a key
+    # file. Upload the file to the custer as a secret like so:
+    #
+    # oc -n openshift-gitops create secret generic \
+    #   argocd-notifications-secret \
+    #   --from-file=github-privateKey=$HOME/path/to/private-key.pem
+    #
+    appID: 289838
+    installationID: 33873599
+    privateKey: $github-privateKey
+
+  context: |
+    argocdUrl: https://openshift-gitops-server-openshift-gitops.apps-crc.testing
+    clusterRouteSuffix: apps-crc.testing
+
+  trigger.on-sync-state-changed: |
+    - when: app.status.operationState.phase in ['Running']
+      send: ["app-sync-running"]
+    - when: app.status.sync.status == 'Unknown'
+      send: ["app-sync-status-unknown"]
+    - when: app.status.operationState.phase in ['Error']
+      send: ["app-sync-error"]
+    - when: app.status.operationState.phase in ['Failed']
+      send: ["app-sync-failed"]
+    - when: app.status.operationState.phase in ['Succeeded']
+      send: ["app-sync-succeeded"]
+
+  trigger.on-deploy-state: |
+    - when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status
+        == 'Healthy'
+      oncePer: app.status.operationState.syncResult.revision
+      send: ["app-deployed"]
+    - when: app.status.health.status == 'Degraded'
+      oncePer: app.status.operationState.syncResult.revision
+      send: ["app-health-degraded"]
+
+  template.app-sync-running: |
+    message: application {{.app.metadata.name}} is being deployed
+    github:
+      status:
+        state: pending
+        label: "ArgoCD/sync"
+        targeturl: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+  template.app-sync-status-unknown: |
+    message: application {{.app.metadata.name}} is being deployed - status unknown
+    github:
+      status:
+        state: pending
+        label: "ArgoCD/sync"
+        targeturl: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+  template.app-sync-error: |
+    message: application {{.app.metadata.name}} deploymen encountered an error
+    github:
+      status:
+        state: error
+        label: "ArgoCD/sync"
+        targeturl: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+  template.app-sync-failed: |
+    message: application {{.app.metadata.name}} deployment failed
+    github:
+      status:
+        state: failed
+        label: "ArgoCD/sync"
+        targeturl: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+  template.app-sync-succeeded: |
+    message: application {{.app.metadata.name}} deployment successful
+    github:
+      status:
+        state: success
+        label: "ArgoCD/sync"
+        targeturl: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
+
+  template.app-deployed: |
+    message: |
+      Application {{.app.metadata.name}} is is now accessible.
+      Click on "details" to access
+    github:
+      status:
+        state: success
+        label: "ArgoCD/deployment"
+        targetURL: "https://{{.app.metadata.annotations.routeName}}.{{.context.clusterRouteSuffix}}"
+  template.app-health-degraded: |
+    message: |
+      Application {{.app.metadata.name}} health is in degraded state
+    github:
+      status:
+        state: failed
+        label: "ArgoCD/deployment"
+        targetURL: "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true"
