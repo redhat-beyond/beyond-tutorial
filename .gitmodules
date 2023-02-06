@@ -1,0 +1,6 @@
+[submodule "argocd/kustomize-crds/kustomize-openshift"]
+	path = argocd/kustomize-crds/kustomize-openshift
+	url = https://github.com/adnovum/kustomize-openshift.git
+[submodule "argocd/app/kustomize-openshift"]
+	path = argocd/app/kustomize-openshift
+	url = https://github.com/adnovum/kustomize-openshift.git

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beyond-tutorial
+  namespace: beyond-tutorial
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beyond-tutorial
+  template:
+    metadata:
+      labels:
+        app: beyond-tutorial
+    spec:
+      containers:
+        - name: app
+          image: image-registry.openshift-image-registry.svc:5000/beyond-tutorial/beyond-tutorial
+          imagePullPolicy: Always
